@@ -58,6 +58,7 @@ const Questionnaire = props =>  {
     return {questionnaireId: questionnaire.id, value: 3}
   });
   const [answers, setAnswers] = useState(initialAnswers);
+  const [numberOfAnsweredToday, setNumberOfAnsweredToday] = useState(0);
   const [imageId, setImageId] = useState();
 
   useEffect(() => {
@@ -65,6 +66,18 @@ const Questionnaire = props =>  {
   }, []);
   
   const getAndSetImageId = () => {
+    firebase.database().ref('images').once('value').then( snapshot => {
+      var notAnsweredImageIds = [];
+      snapshot.forEach( childSnapshot  => {
+        if (!childSnapshot.val().answered_at) {
+          notAnsweredImageIds.push(childSnapshot.key);
+        }
+      });
+      const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
+      setImageId(notAnsweredImageIds[index]);
+    });
+  };
+  const get = () => {
     firebase.database().ref('images').once('value').then( snapshot => {
       var notAnsweredImageIds = [];
       snapshot.forEach( childSnapshot  => {
