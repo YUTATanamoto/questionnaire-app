@@ -27,3 +27,4 @@ images/
 node_modules/
 build/
 public/
+.firebase/
