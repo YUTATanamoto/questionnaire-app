@@ -23,16 +23,29 @@ const useStyles = makeStyles({
 
 const Home = props => {
   const classes = useStyles();
+
   useEffect(() => {
     const date = new Date();
     const currentYear = date.getFullYear();
-    const currentMonth = date.getMonth()+1;
+    const currentMonth = date.getMonth();
     const currentDate = date.getDate();
-    const currentDateString = `${currentYear}${currentMonth}${currentDate}`;
-    console.log(currentDateString);
-    firebase.database().ref('images').orderByChild('answered_at').once('value').then( snapshot => {
+    const _date = new Date(currentYear, currentMonth, currentDate, 0, 0, 0);
+    console.log(_date);
+    const currentDateStartTime = _date.getTime()
+    
+    let timeStamps = [];
+    firebase.database().ref('images').once('value').then( snapshot => {
       snapshot.forEach( childSnapshot  => {
+        if (childSnapshot.val().answered_at) {
+          timeStamps.push(childSnapshot.val().answered_at);
+        }
       });
+      const lastAnsweredTime = Math.max(...timeStamps);
+      if (lastAnsweredTime <= currentDateStartTime) {
+        alert("How are you?");
+      } else {
+        startQuestionnaire();
+      }
     });
   }, []);
   const startQuestionnaire = () => {
