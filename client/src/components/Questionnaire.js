@@ -3,13 +3,13 @@ import MyRadioGroup from './MyRadioGroup';
 import { Button, makeStyles } from '@material-ui/core';
 import { BASE_URL, QUESTIONNAIRES } from '../utils/Constants';
 import firebase from "firebase";
-import { dark } from '@material-ui/core/styles/createPalette';
 
 const useStyles = makeStyles({
   root: {
     height: "100%",
     width: "100%",
     display: "grid",
+    backgroundColor: "gray",
   },
   questionnaireContainer: {
     width: "100%",
@@ -60,6 +60,10 @@ const Questionnaire = props =>  {
   });
   const [answers, setAnswers] = useState(initialAnswers);
   const [imageId, setImageId] = useState();
+
+  useEffect(() => {
+    getAndSetImageId();
+  }, []);
   
   const getAndSetImageId = () => {
     firebase.database().ref('images').once('value').then( snapshot => {
@@ -95,9 +99,6 @@ const Questionnaire = props =>  {
     save();
     getAndSetImageId();
   };
-  useEffect(() => {
-    getAndSetImageId();
-  }, []);
 
   return (
     <div className={classes.root}>
