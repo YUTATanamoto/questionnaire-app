@@ -104,7 +104,7 @@ const Questionnaire = props =>  {
     <div className={classes.root}>
       <div className={classes.questionnaireContainer}>
         <div className={classes.left}>
-          <img src={`http://localhost:5000/static/images/${imageId}.jpg`} className={classes.image} alt={imageId}/>
+          {imageId?<img src={`http://localhost:5000/static/images/${imageId}.jpg`} className={classes.image} alt={imageId}/>:<image src={'logo512.png'}/>}
         </div>
         <div className={classes.right}>
           {QUESTIONNAIRES.map((questionnaire, key)=>
