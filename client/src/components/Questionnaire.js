@@ -77,18 +77,6 @@ const Questionnaire = props =>  {
       setImageId(notAnsweredImageIds[index]);
     });
   };
-  const get = () => {
-    firebase.database().ref('images').once('value').then( snapshot => {
-      var notAnsweredImageIds = [];
-      snapshot.forEach( childSnapshot  => {
-        if (!childSnapshot.val().answered_at) {
-          notAnsweredImageIds.push(childSnapshot.key);
-        }
-      });
-      const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
-      setImageId(notAnsweredImageIds[index]);
-    });
-  };
   const save = () => {
     var data = {};
     const date = new Date();
