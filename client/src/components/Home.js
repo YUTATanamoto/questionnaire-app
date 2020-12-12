@@ -14,20 +14,6 @@ const useStyles = makeStyles({
     "grid-template-rows": "1fr",
     "grid-template-columns": "1fr 1fr",
   },
-  left: {
-    gridRow: 1,
-    gridColumn: 1,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  right: {
-    gridRow: 1,
-    gridColumn: 2,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
   button: {
     marginLeft: "1rem",
     height: "2.5rem",
