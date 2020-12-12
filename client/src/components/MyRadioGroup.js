@@ -41,9 +41,6 @@ const MyRadioGroup = (props) => {
   const classes = useStyles();
   const { questionnaire, answers, setAnswers } = props;
   const _setAnswers = (newAnswer) => {
-    console.log(newAnswer)
-    // using .splice() doesn't work as expected...
-    // answers.splice(questionnaireIndex, 1, newAnswer);
     const newAnswers = answers.map((answer, index)=>{
       if (answer.questionnaireId === questionnaire.id) {
         return {questionnaireId: answer.questionnaireId, value: newAnswer};
@@ -60,11 +57,9 @@ const MyRadioGroup = (props) => {
     <div className={classes.root}>
       <div className={classes.container}>
         <div className={classes.descriptionLeft}>
-          <h2>{questionnaire.descriptionLeft}</h2>
+          <b>{questionnaire.descriptionLeft}</b>
         </div>
         <RadioGroup
-          aria-label="gender"
-          name="gender1"
           value={answers.find(answer => answer.questionnaireId === questionnaire.id).value}
           onChange={e=>_setAnswers(parseInt(e.target.value))}
           >
@@ -80,7 +75,7 @@ const MyRadioGroup = (props) => {
           </div>
         </RadioGroup>
         <div className={classes.descriptionRight}>
-          <h2>{questionnaire.descriptionRight}</h2>
+          <b>{questionnaire.descriptionRight}</b>
         </div>
       </div>
     </div>

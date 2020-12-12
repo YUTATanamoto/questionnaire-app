@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-// import MySlider from './MySlider';
 import MyRadioGroup from './MyRadioGroup';
 import { Button, makeStyles } from '@material-ui/core';
-import { BASE_URL } from '../utils/Constants';
+import { BASE_URL, QUESTIONNAIRES } from '../utils/Constants';
+import firebase from "firebase";
+import { dark } from '@material-ui/core/styles/createPalette';
 
 const useStyles = makeStyles({
   root: {
@@ -11,11 +12,15 @@ const useStyles = makeStyles({
     display: "grid",
   },
   questionnaireContainer: {
+    width: "100%",
+    height: "100%",
     display: "grid",
     "grid-template-rows": "1fr",
-    "grid-template-columns": "2fr 3fr",
+    "grid-template-columns": "3fr 2fr",
   },
   left: {
+    width: "100%",
+    height: "100%",
     gridRow: 1,
     gridColumn: 1,
     display: "flex",
@@ -50,65 +55,63 @@ const useStyles = makeStyles({
 
 const Questionnaire = props =>  {
   const classes = useStyles();
-  const questionnaires = props.location.state.questionnaires ? props.location.state.questionnaires: []
-  const initialAnswers = questionnaires.map((questionnaire, key)=>{
+  const initialAnswers = QUESTIONNAIRES.map((questionnaire, key)=>{
     return {questionnaireId: questionnaire.id, value: 3}
   });
   const [answers, setAnswers] = useState(initialAnswers);
-  const [image, setImage] = useState({});
-  const [isSubmitButtonDisabled, setIsSubmitButtonDisabled] = useState(false);
-  useEffect(() => {
-    getImage();
-  }, []);
-  const _setAnswers = newAnswers => setAnswers(newAnswers);
-  async function getImage() {
-    const url = BASE_URL+'/image'
-    await fetch(url)
-      .then(res => res.json())
-      .then(json => setImage(json.image));
-  };
-  async function postAnswers() {
-    setIsSubmitButtonDisabled(true)
-    const data = {
-      imageId: image.id,
-      answers: answers,
-    };
-    const url = BASE_URL+'/answers'
-    const response = await fetch(url, {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      headers: {'Content-Type': 'application/json'},
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-      body: JSON.stringify(data)
+  const [imageId, setImageId] = useState();
+  
+  const getAndSetImageId = () => {
+    firebase.database().ref('images').once('value').then( snapshot => {
+      var notAnsweredImageIds = [];
+      snapshot.forEach( childSnapshot  => {
+        if (!childSnapshot.val().answered_at) {
+          notAnsweredImageIds.push(childSnapshot.key);
+        }
+      });
+      const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
+      setImageId(notAnsweredImageIds[index]);
     });
-    const responseJson = await response.json();
-    const message = responseJson.message;
-    if (message === 'OK'){
-      setIsSubmitButtonDisabled(false);
-    }
   };
-  async function handleSubmitClick() {
-    await postAnswers();
-    getImage();
-    setAnswers(initialAnswers);
+  const save = () => {
+    var data = {};
+    const date = new Date();
+    const currentTime = date.getTime();
+    answers.forEach( answer => {
+      data[answer.questionnaireId] = answer.value;
+    });
+    firebase.database().ref(`answers/${imageId}`).set(data, (error) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("data saved successfully!");
+      }
+    });
+    var updates = {};
+    updates[`/images/${imageId}/answered_at`] = currentTime;
+    firebase.database().ref().update(updates);
   };
+  const handleClick = () => {
+    save();
+    getAndSetImageId();
+  };
+  useEffect(() => {
+    getAndSetImageId();
+  }, []);
 
   return (
     <div className={classes.root}>
       <div className={classes.questionnaireContainer}>
         <div className={classes.left}>
-          <img src={image.src} className={classes.image} alt={image.src}/>
+          <img src={`http://localhost:5000/static/images/${imageId}.jpg`} className={classes.image} alt={imageId}/>
         </div>
         <div className={classes.right}>
-          {questionnaires.map((questionnaire, questionnaireIndex)=>
-            <div className={classes.sliderContainer} key={questionnaireIndex}>
+          {QUESTIONNAIRES.map((questionnaire, key)=>
+            <div className={classes.sliderContainer} key={key}>
               <MyRadioGroup
                 questionnaire={questionnaire}
-                questionnaireIndex={questionnaireIndex}
                 answers={answers}
-                setAnswers={_setAnswers}
+                setAnswers={setAnswers}
               />
             </div>
           )}
@@ -117,9 +120,8 @@ const Questionnaire = props =>  {
       <Button
         variant="contained"
         color="primary"
-        disabled={isSubmitButtonDisabled}
         className={classes.button}
-        onClick={() => handleSubmitClick()}
+        onClick={handleClick}
       >
         Submit
       </Button>

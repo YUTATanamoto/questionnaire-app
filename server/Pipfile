@@ -11,6 +11,8 @@ flask-cors = "*"
 numpy = "*"
 mysql-connector-python = "*"
 jupyter = "*"
+tqdm = "*"
+firebase-admin = "*"
 
 [requires]
 python_version = "3.8"
