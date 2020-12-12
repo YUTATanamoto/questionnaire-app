@@ -9,7 +9,6 @@ const useStyles = makeStyles({
     height: "100%",
     width: "100%",
     display: "grid",
-    backgroundColor: "gray",
   },
   questionnaireContainer: {
     width: "100%",
@@ -124,7 +123,7 @@ const Questionnaire = props =>  {
         className={classes.button}
         onClick={handleClick}
       >
-        Submit
+        次へ
       </Button>
     </div>
   );
