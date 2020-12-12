@@ -43,8 +43,6 @@ const Home = props => {
       const lastAnsweredTime = Math.max(...timeStamps);
       if (lastAnsweredTime <= currentDateStartTime) {
         alert("How are you?");
-      } else {
-        startQuestionnaire();
       }
     });
   }, []);
