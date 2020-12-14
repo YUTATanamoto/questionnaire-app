@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MyRadioGroup from './MyRadioGroup';
 import { Button, makeStyles } from '@material-ui/core';
 import { QUESTIONNAIRES } from '../utils/Constants';
-import firebase from "firebase";
+import firebase from 'firebase/app'
 
 const drawingTheme = "face";
 const useStyles = makeStyles({
