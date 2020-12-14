@@ -7,22 +7,17 @@ const useStyles = makeStyles({
   root: {
     height: "100%",
     width: "100%",
-    display: "grid",
-  },
-  questionnaireContainer: {
-    display: "grid",
-    "grid-template-rows": "1fr",
-    "grid-template-columns": "1fr 1fr",
-  },
-  button: {
-    marginLeft: "1rem",
-    height: "2.5rem",
-    width: 100,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
 const Home = props => {
   const classes = useStyles();
+  const [numberOfImagesAnsweredToday, setNumberOfImagesAnsweredToday] = useState();
+  const [isSubmitButtonAnabled, setIsSubmitButtonAnabled] = useState(false);
 
   useEffect(() => {
     const date = new Date();
@@ -30,20 +25,16 @@ const Home = props => {
     const currentMonth = date.getMonth();
     const currentDate = date.getDate();
     const _date = new Date(currentYear, currentMonth, currentDate, 0, 0, 0);
-    console.log(_date);
     const currentDateStartTime = _date.getTime()
-    
-    let timeStamps = [];
-    firebase.database().ref('images').once('value').then( snapshot => {
+    firebase.database().ref('answers').once('value').then( snapshot => {
+      let i = 0;
       snapshot.forEach( childSnapshot  => {
-        if (childSnapshot.val().answered_at) {
-          timeStamps.push(childSnapshot.val().answered_at);
+        if (childSnapshot.val().submitted_at > currentDateStartTime) {
+          i += 1;
         }
       });
-      const lastAnsweredTime = Math.max(...timeStamps);
-      if (lastAnsweredTime <= currentDateStartTime) {
-        alert("How are you?");
-      }
+      setNumberOfImagesAnsweredToday(i);
+      setIsSubmitButtonAnabled(true);
     });
   }, []);
   const startQuestionnaire = () => {
@@ -51,17 +42,28 @@ const Home = props => {
       pathname: "/questionnaire",
     });
   };
+  const startPreQuestionnaire = () => {
+    props.history.push({
+      pathname: "/pre_questionnaire",
+    });
+  };
+  const handleClick = () => {
+    if (numberOfImagesAnsweredToday === 0) {
+      startPreQuestionnaire();
+    } else {
+      startQuestionnaire();
+    }
+  }; 
 
   return (
     <div className={classes.root}>
-      <p>Home</p>
       <Button
-        variant="contained"
+        variant="outlined"
         color="primary"
-        className={classes.button}
-        onClick={startQuestionnaire}
+        onClick={handleClick}
+        disabled={!isSubmitButtonAnabled}
       >
-        Start
+        はじめる
       </Button>
     </div>
   );

@@ -1,131 +1,179 @@
 import React, { useState, useEffect } from 'react';
 import MyRadioGroup from './MyRadioGroup';
 import { Button, makeStyles } from '@material-ui/core';
-import { BASE_URL, QUESTIONNAIRES } from '../utils/Constants';
+import { QUESTIONNAIRES } from '../utils/Constants';
 import firebase from "firebase";
 
+const drawingTheme = "face";
 const useStyles = makeStyles({
   root: {
-    height: "100%",
-    width: "100%",
-    display: "grid",
-  },
-  questionnaireContainer: {
     width: "100%",
     height: "100%",
     display: "grid",
-    "grid-template-rows": "1fr",
-    "grid-template-columns": "3fr 2fr",
+    "grid-template-columns": "1fr 1fr",
+    justifyContent: "center",
+    alignItems: "center",
   },
   left: {
     width: "100%",
     height: "100%",
-    gridRow: 1,
-    gridColumn: 1,
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  right: {
-    gridRow: 1,
-    gridColumn: 2,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  image: {
-    width: "100%",
-    rightRow: 1,
-    gridColumn: 1,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
+    alignItems: "center",
+    justifyContent: "center",
     objectFit: "contain",
   },
-  sliderContainer: {
-    width: "100%",
+  right: {
+    width: "90%",
+    height: "70%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  currentAchievement: {
+    flex: "2 0 auto",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioGroups: {
+    flex: "9 0 auto",
+    display: "flex",
+    flexDirection: "column",
+  },
+  radioGroup: {
+    flex: "1 0 auto",
   },
   button: {
-    marginLeft: "1rem",
-    height: "2.5rem",
-    width: 100,
+    flex: "0.3 0 auto",
   },
 });
 
 const Questionnaire = props =>  {
   const classes = useStyles();
+  const [isSubmitButtonAnabled, setIsSubmitButtonAnabled] = useState(false);
   const initialAnswers = QUESTIONNAIRES.map((questionnaire, key)=>{
-    return {questionnaireId: questionnaire.id, value: 3}
+    return {questionnaireId: questionnaire.id, selectedAt: null, value: null}
   });
   const [answers, setAnswers] = useState(initialAnswers);
-  const [numberOfAnsweredToday, setNumberOfAnsweredToday] = useState(0);
   const [imageId, setImageId] = useState();
+  const [startTime, setStartTime] = useState(0);
+  const [numberOfImagesAnsweredToday, setNumberOfImagesAnsweredToday] = useState();
+  const [numberOfImagesAnswered, setNumberOfImagesAnswered] = useState();
 
   useEffect(() => {
+    getAndSetStartTime();
+    getCurrentAchievement();
     getAndSetImageId();
   }, []);
   
+  const getAndSetStartTime = () => {
+    const date = new Date();
+    const currentTime = date.getTime();
+    setStartTime(currentTime);
+  };
+  const resetAnswers = () => {
+    setAnswers(initialAnswers);
+  };
+  const getCurrentAchievement = () => {
+    const date = new Date();
+    const currentYear = date.getFullYear();
+    const currentMonth = date.getMonth();
+    const currentDate = date.getDate();
+    const _date = new Date(currentYear, currentMonth, currentDate, 0, 0, 0);
+    const currentDateStartTime = _date.getTime()
+    firebase.database().ref('answers').once('value').then( snapshot => {
+      let i = 0;
+      snapshot.forEach( childSnapshot  => {
+        if (childSnapshot.val().submitted_at > currentDateStartTime) {
+          i += 1;
+        }
+      });
+      setNumberOfImagesAnsweredToday(i);
+      setNumberOfImagesAnswered(snapshot.numChildren());
+    });
+  };
   const getAndSetImageId = () => {
-    firebase.database().ref('images').once('value').then( snapshot => {
+    firebase.database().ref('images').orderByChild('theme').equalTo(drawingTheme).once('value').then( snapshot => {
       var notAnsweredImageIds = [];
       snapshot.forEach( childSnapshot  => {
-        if (!childSnapshot.val().answered_at) {
+        if (!childSnapshot.val().submitted_at) {
           notAnsweredImageIds.push(childSnapshot.key);
         }
       });
       const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
-      setImageId(notAnsweredImageIds[index]);
+      setImageId(parseInt(notAnsweredImageIds[index]));
     });
   };
-  const save = () => {
+  async function save() {
     var data = {};
     const date = new Date();
     const currentTime = date.getTime();
+    const newAnswerRef = await firebase.database().ref("answers").push();
+    data["started_at"] = startTime;
+    data["submitted_at"] = currentTime;
+    data["image_id"] = imageId;
+    data["contents"] = {}
     answers.forEach( answer => {
-      data[answer.questionnaireId] = answer.value;
+      const newContentRef = newAnswerRef.child("contents").push();
+      const newContentKey = newContentRef.key
+      data["contents"][newContentKey] = {};
+      data["contents"][newContentKey]["questionaire_id"] = answer.questionnaireId;
+      data["contents"][newContentKey]["value"] = answer.value;
+      data["contents"][newContentKey]["selected_at"] = answer.selectedAt;
     });
-    firebase.database().ref(`answers/${imageId}`).set(data, (error) => {
+    await newAnswerRef.set(data);
+    var updates = {};
+    updates[`/images/${imageId}/submitted_at`] = currentTime;
+    await firebase.database().ref().update(updates, (error) => {
       if (error) {
         console.log(error);
       } else {
         console.log("data saved successfully!");
       }
     });
-    var updates = {};
-    updates[`/images/${imageId}/answered_at`] = currentTime;
-    firebase.database().ref().update(updates);
   };
-  const handleClick = () => {
-    save();
+  async function handleClick() {
+    setIsSubmitButtonAnabled(false);
+    await save();
+    resetAnswers();
+    getCurrentAchievement();
     getAndSetImageId();
+    getAndSetStartTime();
   };
 
   return (
     <div className={classes.root}>
-      <div className={classes.questionnaireContainer}>
-        <div className={classes.left}>
-          {imageId?<img src={`http://localhost:5000/static/images/${imageId}.jpg`} className={classes.image} alt={imageId}/>:<image src={'logo512.png'}/>}
+      {imageId?<img src={`https://children-drawing-images.web.app/${imageId}.jpg`} className={classes.left} alt={imageId}/>:<div className={classes.left}>Loading...</div>}
+      <div className={classes.right}>
+        <div className={classes.currentAchievement}>
+          <b><span role="img" aria-label="_">✨✨</span>　累計回答数　{numberOfImagesAnswered}　<span role="img" aria-label="_">✨✨</span></b>
+          <b><span role="img" aria-label="_">✨</span>　本日の回答数　{numberOfImagesAnsweredToday}　<span role="img" aria-label="_">✨</span></b>
         </div>
-        <div className={classes.right}>
+        <div className={classes.radioGroups}>
           {QUESTIONNAIRES.map((questionnaire, key)=>
-            <div className={classes.sliderContainer} key={key}>
+            <div className={classes.radioGroup} key={key}>
               <MyRadioGroup
                 questionnaire={questionnaire}
                 answers={answers}
                 setAnswers={setAnswers}
+                setIsSubmitButtonAnabled={setIsSubmitButtonAnabled}
               />
             </div>
           )}
         </div>
+        <Button
+          variant="outlined"
+          color="primary"
+          className={classes.button}
+          onClick={handleClick}
+          disabled={!isSubmitButtonAnabled}
+        >
+          次へ
+        </Button>
       </div>
-      <Button
-        variant="contained"
-        color="primary"
-        className={classes.button}
-        onClick={handleClick}
-      >
-        次へ
-      </Button>
     </div>
   );
 }

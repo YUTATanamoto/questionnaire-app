@@ -1,23 +1,23 @@
 export const QUESTIONNAIRES = [
-  {
-    id: 0,
-    descriptionRight: "好き",
-    descriptionLeft: "嫌い",
-  },
-  {
-    id: 1,
-    descriptionRight: "快",
-    descriptionLeft: "不快",
-  },
-  {
-    id: 2,
-    descriptionRight: '面白い',
-    descriptionLeft: '退屈な',
-  },
+  // {
+  //   id: 0,
+  //   descriptionRight: "好き",
+  //   descriptionLeft: "嫌い",
+  // },
+  // {
+  //   id: 1,
+  //   descriptionRight: "快",
+  //   descriptionLeft: "不快",
+  // },
+  // {
+  //   id: 2,
+  //   descriptionRight: '面白い',
+  //   descriptionLeft: '退屈な',
+  // },
   {
     id:3,
-    descriptionRight: '豊である',
-    descriptionLeft: '豊でない',
+    descriptionRight: '豊かである',
+    descriptionLeft: '豊かでない',
   },
   {
     id: 4,
@@ -31,18 +31,31 @@ export const QUESTIONNAIRES = [
   },
   {
     id: 6,
-    descriptionRight: "弱々しい",
-    descriptionLeft: "力強い",
+    descriptionRight: "力強い",
+    descriptionLeft: "弱々しい",
   },
   {
     id: 7,
-    descriptionRight: "平凡な",
-    descriptionLeft: "独創的な",
+    descriptionRight: "独創的な",
+    descriptionLeft: "平凡な",
   },
   {
     id: 8,
     descriptionRight: "感情的な",
     descriptionLeft: "理性的な",
+  },
+];
+
+export const PRE_QUESTIONNAIRES = [
+  {
+    id: 9,
+    descriptionRight: "体調が良い",
+    descriptionLeft: "体調が悪い",
+  },
+  {
+    id: 10,
+    descriptionRight: "気分が良い",
+    descriptionLeft: "気分が悪い",
   },
 ];
 

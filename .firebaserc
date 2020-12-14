@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "children-drawing-annotation"
+  },
+  "targets": {
+    "children-drawing-annotation": {
+      "hosting": {
+        "client": [
+          "children-drawing-annotation"
+        ],
+        "images": [
+          "children-drawing-images"
+        ]
+      }
+    }
   }
 }
