@@ -14,7 +14,7 @@ jobs:
       - run: cd client && npm ci && npm run build
         env:
           CI: false
-      - run cd server
+      - run: cd server
       - uses: VaultVulp/action-pipenv@v2.0.1
         with:
         command: install
