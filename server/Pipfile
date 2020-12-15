@@ -16,3 +16,6 @@ firebase-admin = "*"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+setup = python3 server/setup_realtime_database_content.py
