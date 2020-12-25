@@ -17,7 +17,7 @@ const useStyles = makeStyles({
 const Home = props => {
   const classes = useStyles();
   const [numberOfImagesAnsweredToday, setNumberOfImagesAnsweredToday] = useState();
-  const [isSubmitButtonAnabled, setIsSubmitButtonAnabled] = useState(false);
+  const [isButtonAnabled, setIsButtonAnabled] = useState(false);
 
   useEffect(() => {
     const date = new Date();
@@ -34,7 +34,7 @@ const Home = props => {
         }
       });
       setNumberOfImagesAnsweredToday(i);
-      setIsSubmitButtonAnabled(true);
+      setisButtonAnabled(true);
     });
   }, []);
   const startQuestionnaire = () => {
@@ -61,7 +61,7 @@ const Home = props => {
         variant="outlined"
         color="primary"
         onClick={handleClick}
-        disabled={!isSubmitButtonAnabled}
+        disabled={!isButtonAnabled}
       >
         はじめる
       </Button>
