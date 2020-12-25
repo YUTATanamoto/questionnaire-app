@@ -34,7 +34,7 @@ const Home = props => {
         }
       });
       setNumberOfImagesAnsweredToday(i);
-      setisButtonAnabled(true);
+      setIsButtonAnabled(true);
     });
   }, []);
   const startQuestionnaire = () => {
