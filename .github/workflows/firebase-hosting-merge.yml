@@ -14,13 +14,6 @@ jobs:
       - run: cd client && npm ci && npm run build
         env:
           CI: false
-      - run: cd server
-      - uses: VaultVulp/action-pipenv@v2.0.1
-        with:
-          command: install
-      - uses: VaultVulp/action-pipenv@v2.0.1
-        with:
-          command: run python3 server/setup_realtime_database_content.py
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
