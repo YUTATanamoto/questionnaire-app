@@ -8,10 +8,13 @@ const useStyles = makeStyles({
     height: "100%",
     width: "100%",
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
+  button: {
+    margin: 10,
+  }
 });
 
 const Home = props => {
@@ -47,23 +50,38 @@ const Home = props => {
       pathname: "/pre_questionnaire",
     });
   };
-  const handleClick = () => {
+  const handleStartButtonClick = () => {
     if (numberOfImagesAnsweredToday === 0) {
       startPreQuestionnaire();
     } else {
       startQuestionnaire();
     }
   }; 
+  const handleCheckButtonClick = () => {
+    props.history.push({
+      pathname: "/result",
+    });
+  };
 
   return (
     <div className={classes.root}>
       <Button
         variant="outlined"
         color="primary"
-        onClick={handleClick}
+        className={classes.button}
+        onClick={handleStartButtonClick}
         disabled={!isButtonAnabled}
       >
-        はじめる
+        回答をはじめる
+      </Button>
+      <Button
+        variant="outlined"
+        color="primary"
+        className={classes.button}
+        onClick={handleCheckButtonClick}
+        disabled={!isButtonAnabled}
+      >
+        回答を確認する
       </Button>
     </div>
   );
