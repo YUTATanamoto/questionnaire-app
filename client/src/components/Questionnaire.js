@@ -4,7 +4,7 @@ import { Button, makeStyles } from '@material-ui/core';
 import { QUESTIONNAIRES } from '../utils/Constants';
 import firebase from 'firebase/app'
 
-const drawingTheme = "face";
+const drawingThemes = ["face"];
 const useStyles = makeStyles({
   root: {
     width: "100%",
@@ -58,6 +58,7 @@ const Questionnaire = props =>  {
     return {questionnaireId: questionnaire.id, selectedAt: null, value: null}
   });
   const [answers, setAnswers] = useState(initialAnswers);
+  const [themeIndex, setThemeIndex] = useState(0);
   const [imageId, setImageId] = useState();
   const [startTime, setStartTime] = useState(0);
   const [numberOfImagesAnsweredToday, setNumberOfImagesAnsweredToday] = useState();
@@ -96,15 +97,24 @@ const Questionnaire = props =>  {
     });
   };
   const getAndSetImageId = () => {
-    firebase.database().ref('images').orderByChild('theme').equalTo(drawingTheme).once('value').then( snapshot => {
+    firebase.database().ref('images').orderByChild('theme').equalTo(drawingThemes[themeIndex]).once('value').then( snapshot => {
       var notAnsweredImageIds = [];
       snapshot.forEach( childSnapshot  => {
         if (!childSnapshot.val().submitted_at) {
           notAnsweredImageIds.push(childSnapshot.key);
         }
       });
-      const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
-      setImageId(parseInt(notAnsweredImageIds[index]));
+      if (notAnsweredImageIds.length > 0) {
+        const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
+        setImageId(parseInt(notAnsweredImageIds[index]));
+      } else {
+        const newThemeIndex = themeIndex + 1;
+        setThemeIndex(newThemeIndex);
+        props.history.push({
+          pathname: "/done",
+        });
+        getAndSetImageId();
+      }
     });
   };
   async function save() {

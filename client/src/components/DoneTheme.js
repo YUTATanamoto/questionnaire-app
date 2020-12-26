@@ -25,7 +25,7 @@ const Home = props => {
 
   const handleClick = () => {
     props.history.push({
-      pathname: "/done",
+        pathname: "/questionnaire",
     });
   };
 
