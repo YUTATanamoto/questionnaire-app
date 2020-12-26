@@ -1,4 +1,4 @@
-# 児童画アンケートアプリ  
+# 児童画評価アプリ  
 アンケートアプリです。  
 [ここ](https://children-drawing-annotation.web.app/)にデプロイしてあります。
 
