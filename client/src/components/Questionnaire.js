@@ -68,7 +68,6 @@ const Questionnaire = props =>  {
     updateThemeIndex();
     getAndSetStartTime();
     getCurrentAchievement();
-    getAndSetImageId();
   }, []);
   useEffect(() => {
     getAndSetImageId();
@@ -118,7 +117,7 @@ const Questionnaire = props =>  {
       var notAnsweredImageIds = Object.keys(snapshot.val()).filter( key  => !snapshot.val()[key].submitted_at);
       if (notAnsweredImageIds.length > 0) {
         const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
-        setImageId(parseInt(notAnsweredImageIds[index]));
+        setImageId(notAnsweredImageIds[index]);
       }
     });
   };

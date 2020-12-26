@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { withRouter } from 'react-router';
 import { Button, makeStyles } from '@material-ui/core';
-import firebase from 'firebase/app'
 
 const useStyles = makeStyles({
   root: {

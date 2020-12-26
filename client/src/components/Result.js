@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardActionArea, CardActions, CardContent, CardMedia, Typography, Button, makeStyles } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
+import { Card, CardContent, CardMedia, Typography, makeStyles } from '@material-ui/core';
 import { QUESTIONNAIRES } from '../utils/Constants';
 import firebase from 'firebase/app'
 
-const drawingTheme = "face";
 const useStyles = makeStyles({
   root: {
     width: "100%",
