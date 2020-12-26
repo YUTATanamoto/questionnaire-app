@@ -4,7 +4,7 @@ import { Button, makeStyles } from '@material-ui/core';
 import { QUESTIONNAIRES } from '../utils/Constants';
 import firebase from 'firebase/app'
 
-const drawingThemes = ["face"];
+const drawingThemes = ["face", "winter-memory", "summer-memory"];
 const useStyles = makeStyles({
   root: {
     width: "100%",
@@ -65,11 +65,15 @@ const Questionnaire = props =>  {
   const [numberOfImagesAnswered, setNumberOfImagesAnswered] = useState();
 
   useEffect(() => {
+    updateThemeIndex();
     getAndSetStartTime();
     getCurrentAchievement();
     getAndSetImageId();
   }, []);
-  
+  useEffect(() => {
+    getAndSetImageId();
+  }, [themeIndex]);
+
   const getAndSetStartTime = () => {
     const date = new Date();
     const currentTime = date.getTime();
@@ -96,24 +100,35 @@ const Questionnaire = props =>  {
       setNumberOfImagesAnswered(snapshot.numChildren());
     });
   };
+  async function updateThemeIndex() {
+    for (let i = 0; i < drawingThemes.length; i++) {
+      let filtered = [];
+      await firebase.database().ref('images').orderByChild('theme').equalTo(drawingThemes[i]).once('value').then( snapshot => {
+        const images = Object.values(snapshot.val());
+        filtered = images.filter( image => !image.submitted_at );
+      });
+      if (filtered.length > 0) {
+        setThemeIndex(i);
+        break;
+      }
+    }
+  };
   const getAndSetImageId = () => {
     firebase.database().ref('images').orderByChild('theme').equalTo(drawingThemes[themeIndex]).once('value').then( snapshot => {
-      var notAnsweredImageIds = [];
-      snapshot.forEach( childSnapshot  => {
-        if (!childSnapshot.val().submitted_at) {
-          notAnsweredImageIds.push(childSnapshot.key);
-        }
-      });
+      var notAnsweredImageIds = Object.keys(snapshot.val()).filter( key  => !snapshot.val()[key].submitted_at);
       if (notAnsweredImageIds.length > 0) {
         const index = Math.floor(Math.random() * Math.floor(notAnsweredImageIds.length));
         setImageId(parseInt(notAnsweredImageIds[index]));
-      } else {
-        const newThemeIndex = themeIndex + 1;
-        setThemeIndex(newThemeIndex);
+      }
+    });
+  };
+  async function check() {
+    await firebase.database().ref('images').orderByChild('theme').equalTo(drawingThemes[themeIndex]).once('value').then( snapshot => {
+      var notAnsweredImageIds = Object.keys(snapshot.val()).filter( key  => !snapshot.val()[key].submitted_at);
+      if (notAnsweredImageIds.length === 0) {
         props.history.push({
           pathname: "/done",
         });
-        getAndSetImageId();
       }
     });
   };
@@ -152,11 +167,12 @@ const Questionnaire = props =>  {
     getCurrentAchievement();
     getAndSetImageId();
     getAndSetStartTime();
+    await check();
   };
 
   return (
     <div className={classes.root}>
-      {imageId?<img src={`https://children-drawing-images.web.app/${imageId}.jpg`} className={classes.left} alt={imageId}/>:<div className={classes.left}>Loading...</div>}
+      {imageId !== undefined?<img src={`https://children-drawing-images.web.app/${imageId}.jpg`} className={classes.left} alt={imageId}/>:<div className={classes.left}>Loading...</div>}
       <div className={classes.right}>
         <div className={classes.currentAchievement}>
           <b><span role="img" aria-label="_">✨✨</span>　累計回答数　{numberOfImagesAnswered}　<span role="img" aria-label="_">✨✨</span></b>
