@@ -10,6 +10,7 @@ const useStyles = makeStyles({
     width: "100%",
     display: "flex",
     flexWrap:"wrap",
+    justifyContent: "space-around",
   },
   card: {
     width: 500,
@@ -19,7 +20,6 @@ const useStyles = makeStyles({
   },
   media: {
     width: 200,
-    // objectFit: "contain",
   },
   details: {
     display: 'flex',
