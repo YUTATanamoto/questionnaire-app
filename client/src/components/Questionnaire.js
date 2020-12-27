@@ -4,7 +4,7 @@ import { Button, makeStyles } from '@material-ui/core';
 import { QUESTIONNAIRES } from '../utils/Constants';
 import firebase from 'firebase/app'
 
-const drawingThemes = ["face", "winter-memory", "summer-memory"];
+const drawingThemes = ["face", "winter-memory", "summer-memory", "karuta"];
 const useStyles = makeStyles({
   root: {
     width: "100%",
