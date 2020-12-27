@@ -29,7 +29,6 @@ for image_dir in image_dirs:
             "theme_id": int(theme_id),
             "theme": theme,
             "student_number": int(student_number),
-            "answered_at": None,
         }
         target_image_path = os.path.join(public_dir, "{}.jpg".format(image_id))
         shutil.copy(image_path, target_image_path)
